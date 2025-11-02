@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Kindle Auto Translator</title>
+    <style>
+        body {
+            width: 320px;
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 0;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h2 {
+            margin: 0 0 5px 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 20px;
+            background: white;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+            font-family: monospace;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: #48bb78;
+        }
+
+        button.secondary:hover {
+            background: #38a169;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        }
+
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            display: block;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            display: block;
+        }
+
+        .info-box {
+            background: #f7fafc;
+            border-left: 3px solid #667eea;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #2d3748;
+        }
+
+        .shortcut {
+            background: #e2e8f0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .footer {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.05);
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            color: #667eea;
+            border: 1px solid #667eea;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .toggle-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h2>📘 Kindle Auto Translator</h2>
+        <p>日本語 → 简体中文</p>
+    </div>
+
+    <div class="content">
+        <div class="section">
+            <div class="section-title">🔑 OpenAI API Key</div>
+            <input id="apiKey" type="password" placeholder="sk-..." />
+            <button id="toggleKey" class="toggle-btn">Show Key</button>
+            <button id="saveKey">💾 Save API Key</button>
+            <div id="keyStatus" class="status"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🚀 Quick Translate</div>
+            <button id="translate" class="secondary">🌐 Translate Current Page</button>
+        </div>
+
+        <div class="info-box">
+            <strong>Keyboard Shortcut:</strong>
+            <div style="margin-top: 5px;">
+                Mac: <span class="shortcut">⌘ Cmd + Shift + T</span><br>
+                Windows/Linux: <span class="shortcut">Ctrl + Shift + T</span>
+            </div>
+        </div>
+
+        <div class="info-box" style="margin-top: 10px;">
+            <strong>How to use:</strong>
+            1. Enter your OpenAI API key above<br>
+            2. Navigate to a Kindle book page<br>
+            3. Click the button or use the shortcut<br>
+            4. View the Chinese translation!
+        </div>
+    </div>
+
+    <div class="footer">
+        Powered by GPT-4o mini<br>
+        Works on read.amazon.co.jp & read.amazon.com
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>

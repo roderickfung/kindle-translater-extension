@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Kindle Auto Translator",
+  "version": "1.0",
+  "description": "Translate Kindle Cloud Reader pages from Japanese to Chinese using GPT-4o mini.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://read.amazon.co.jp/*",
+    "https://read.amazon.com/*",
+    "https://api.openai.com/*"
+  ],
+  "background": { 
+    "service_worker": "background.js" 
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Kindle Translator"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://read.amazon.co.jp/*", "https://read.amazon.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "translate-page": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+T",
+        "mac": "Command+Shift+T"
+      },
+      "description": "Translate current Kindle page"
+    }
+  }
+}

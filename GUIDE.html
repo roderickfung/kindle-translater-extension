@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kindle Auto Translator - Visual Guide</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: white;
+            color: #333;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .step {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .step h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        code {
+            background: #e2e8f0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .keyboard {
+            background: #2d3748;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-weight: bold;
+            display: inline-block;
+            margin: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #48bb78;
+        }
+        .warning {
+            background: #fef3c7;
+            color: #78350f;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #f59e0b;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .feature {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .button-demo {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📘 Kindle Auto Translator</h1>
+        <p class="subtitle">Japanese → 简体中文 | Visual Installation & Usage Guide</p>
+
+        <div class="success">
+            <strong>✅ Your extension is ready to use!</strong><br>
+            Follow the steps below to get started in 5 minutes.
+        </div>
+
+        <div class="step">
+            <h2>🔑 Step 1: Get Your OpenAI API Key</h2>
+            <p>You need an OpenAI API key to use this extension:</p>
+            <ol>
+                <li>Visit: <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a></li>
+                <li>Sign in or create a free account</li>
+                <li>Click <strong>"Create new secret key"</strong></li>
+                <li>Copy the key (it starts with <code>sk-...</code>)</li>
+                <li>Keep it safe - you'll need it in Step 3!</li>
+            </ol>
+            <div class="warning">
+                ⚠️ <strong>Cost:</strong> GPT-4o mini is very cheap - less than $0.001 per page!<br>
+                A $5 credit can translate thousands of pages.
+            </div>
+        </div>
+
+        <div class="step">
+            <h2>📦 Step 2: Install the Extension</h2>
+            <ol>
+                <li>Open Chrome and navigate to: <code>chrome://extensions/</code></li>
+                <li>Turn on <strong>Developer mode</strong> (toggle in top-right corner)</li>
+                <li>Click <strong>"Load unpacked"</strong></li>
+                <li>Select the <code>kindle-auto-translate</code> folder</li>
+                <li>The extension should now appear in your extensions list! 🎉</li>
+            </ol>
+            <p><strong>Optional:</strong> Pin the extension by clicking the puzzle piece 🧩 icon in Chrome toolbar and clicking the pin icon next to "Kindle Auto Translator"</p>
+        </div>
+
+        <div class="step">
+            <h2>⚙️ Step 3: Configure Your API Key</h2>
+            <ol>
+                <li>Click the <strong>Kindle Auto Translator</strong> icon in Chrome toolbar</li>
+                <li>Paste your OpenAI API key in the text field</li>
+                <li>Click <strong>"💾 Save API Key"</strong></li>
+                <li>Wait for the success message ✅</li>
+            </ol>
+            <p><strong>Security:</strong> Your API key is stored securely in Chrome's local storage and never shared with anyone except OpenAI.</p>
+        </div>
+
+        <div class="step">
+            <h2>🚀 Step 4: Use the Extension</h2>
+            
+            <h3>Navigate to Kindle</h3>
+            <p>Go to one of these sites and open a Japanese book:</p>
+            <ul>
+                <li><a href="https://read.amazon.co.jp/" target="_blank">read.amazon.co.jp</a> (Japanese site)</li>
+                <li><a href="https://read.amazon.com/" target="_blank">read.amazon.com</a> (International site)</li>
+            </ul>
+
+            <h3>Trigger Translation (2 ways)</h3>
+            
+            <p><strong>Method 1: Keyboard Shortcut</strong> ⭐ Recommended</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <div class="keyboard">⌘ Cmd + Shift + T</div> (Mac)<br>
+                <div class="keyboard">Ctrl + Shift + T</div> (Windows/Linux)
+            </div>
+
+            <p><strong>Method 2: Click Button</strong></p>
+            <ol>
+                <li>Click the extension icon</li>
+                <li>Click <span class="button-demo" style="font-size: 12px; padding: 6px 12px;">🌐 Translate Current Page</span></li>
+            </ol>
+
+            <h3>View Your Translation</h3>
+            <ul>
+                <li>A loading overlay will appear while processing</li>
+                <li>Translation displays in a beautiful centered modal</li>
+                <li><strong>Close it:</strong> Press <code>Esc</code>, click ✕, or click outside</li>
+            </ul>
+        </div>
+
+        <h2 style="color: #667eea; text-align: center; margin-top: 40px;">✨ Features</h2>
+        
+        <div class="feature-grid">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <strong>Fast Translation</strong>
+                <p style="font-size: 14px; color: #666;">Uses GPT-4o mini for quick, accurate results</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎨</div>
+                <strong>Beautiful UI</strong>
+                <p style="font-size: 14px; color: #666;">Modern overlay with smooth animations</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <strong>Secure</strong>
+                <p style="font-size: 14px; color: #666;">API key stored locally and encrypted</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💰</div>
+                <strong>Affordable</strong>
+                <p style="font-size: 14px; color: #666;">Less than 1/10 cent per page</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⌨️</div>
+                <strong>Keyboard Shortcut</strong>
+                <p style="font-size: 14px; color: #666;">Instant access with hotkey</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <strong>Smart Detection</strong>
+                <p style="font-size: 14px; color: #666;">Only works on Kindle pages</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h2>🐛 Troubleshooting</h2>
+            
+            <h3>Translation not working?</h3>
+            <ul>
+                <li>✅ Make sure you're on a Kindle book page (not the library)</li>
+                <li>✅ Verify your API key is saved correctly</li>
+                <li>✅ Check your OpenAI account has available credits</li>
+                <li>✅ Wait for the page to fully load before translating</li>
+            </ul>
+
+            <h3>Getting errors?</h3>
+            <ul>
+                <li>Open Chrome DevTools: <code>Right-click → Inspect → Console</code></li>
+                <li>Look for messages starting with <code>[Kindle Translator]</code></li>
+                <li>Check your OpenAI account balance at platform.openai.com</li>
+            </ul>
+
+            <h3>Still having issues?</h3>
+            <ul>
+                <li>Go to <code>chrome://extensions/</code></li>
+                <li>Click the refresh icon on the extension</li>
+                <li>Reload the Kindle page</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <h2 style="margin-top: 0;">🎉 You're All Set!</h2>
+            <p>Your Kindle Auto Translator is ready to use. Start reading Japanese books and instantly translate them to Chinese with a single keystroke!</p>
+            <p style="margin-bottom: 0;"><strong>Happy Reading!</strong> 📚✨</p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Documentation:</strong></p>
+            <p>
+                <a href="README.md">README.md</a> • 
+                <a href="INSTALL.md">INSTALL.md</a> • 
+                <a href="SUMMARY.md">SUMMARY.md</a>
+            </p>
+            <p style="margin-top: 20px; font-size: 12px;">
+                Built with ❤️ for language learners<br>
+                Powered by OpenAI GPT-4o mini
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+

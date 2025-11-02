@@ -1,0 +1,31 @@
+# API Keys (just in case - but keys are stored in browser, not files)
+*.key
+*.pem
+.env
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Chrome extension packaging
+*.crx
+*.pem
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# Testing
+test/
+
