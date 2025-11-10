@@ -1,15 +1,17 @@
-# Quick Installation Guide
+# Quick Installation Guide - Google Gemini
 
 ## 📦 Install in 5 Minutes
 
-### Step 1: Get Your OpenAI API Key (2 min)
-1. Go to https://platform.openai.com/api-keys
-2. Sign in (or create a free account)
-3. Click "Create new secret key"
-4. **Copy the key** - it starts with `sk-...`
+### Step 1: Get Your Google API Key (2 min)
+1. Go to https://aistudio.google.com/app/apikey
+2. Sign in with your Google account
+3. Click **"Create API Key"**
+4. **Copy the key** - it starts with `AIza...`
 5. Save it somewhere safe (you'll need it in Step 3)
 
-> 💡 **Tip**: GPT-4o mini is very cheap - less than $0.001 per page!
+> 💡 **Best Part**: Gemini 1.5 Flash has a generous FREE tier!
+> - 1,500 requests per day - FREE
+> - Perfect for personal use
 
 ### Step 2: Install the Extension (1 min)
 1. Open Chrome and go to `chrome://extensions/`
@@ -55,13 +57,18 @@
 ## ❓ Common Questions
 
 **Q: Is my API key safe?**  
-A: Yes! It's stored locally in Chrome's encrypted storage. Never shared anywhere except directly with OpenAI.
+A: Yes! It's stored locally in Chrome's encrypted storage. Never shared anywhere except directly with Google Gemini API.
 
 **Q: How much does it cost?**  
-A: Very little! GPT-4o mini costs less than 1/10th of a cent per page. A $5 credit can translate thousands of pages.
+A: **FREE!** Gemini 1.5 Flash offers:
+- 15 requests per minute - FREE
+- 1,500 requests per day - FREE
+- 1 million tokens per day - FREE
+
+Perfect for personal use. You can translate hundreds of pages per day without paying!
 
 **Q: Does it work offline?**  
-A: No, it needs internet to access the OpenAI API.
+A: No, it needs internet to access the Google Gemini API.
 
 **Q: Can I use it on other websites?**  
 A: Currently designed for Kindle Cloud Reader only. It works on:
@@ -75,7 +82,7 @@ A: Yes! Edit the system prompt in `content.js` to change the target language.
 A: Check:
 - ✅ You're on a Kindle book page (not the library)
 - ✅ Your API key is saved correctly  
-- ✅ Your OpenAI account has available credits
+- ✅ Your API key starts with "AIza"
 - ✅ The page has finished loading
 
 ---
@@ -83,8 +90,8 @@ A: Check:
 ## 🎯 Pro Tips
 
 1. **Wait for page load**: Let the book page fully load before translating
-2. **Short pages work best**: Very long pages may hit token limits
-3. **Check your usage**: Monitor your OpenAI usage at platform.openai.com
+2. **Free tier is generous**: 1,500 requests per day is plenty for most users
+3. **Check your usage**: Monitor at [Google AI Studio](https://aistudio.google.com/)
 4. **Pin the extension**: Click the puzzle icon 🧩 and pin for easy access
 
 ---
@@ -94,8 +101,10 @@ A: Check:
 1. Check the full [README.md](README.md) for detailed troubleshooting
 2. Open Chrome DevTools (F12) and check Console for errors
 3. Try reloading the extension and the Kindle page
+4. Verify your API key at [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ---
 
 **Happy Reading!** 📚✨
 
+**Powered by Google Gemini 1.5 Flash - FREE tier available!**

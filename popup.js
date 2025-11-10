@@ -14,14 +14,14 @@ let isKeyVisible = false;
 // ============================================================================
 
 // Load existing API key on popup open
-chrome.storage.local.get("openai_api_key", (data) => {
-  if (data.openai_api_key && data.openai_api_key.length > 0) {
-    actualKey = data.openai_api_key;
+chrome.storage.local.get("google_api_key", (data) => {
+  if (data.google_api_key && data.google_api_key.length > 0) {
+    actualKey = data.google_api_key;
     keyInput.value = "••••••••••••••••••••";
     keyInput.placeholder = "API key is set";
     showStatus("API key is configured ✓", "success");
   } else {
-    keyInput.placeholder = "Enter your OpenAI API key (sk-...)";
+    keyInput.placeholder = "Enter your Google API key (AIza...)";
   }
 });
 
@@ -39,14 +39,14 @@ saveBtn.addEventListener("click", () => {
     return;
   }
   
-  // Basic validation
-  if (!key.startsWith("sk-") || key.length < 40) {
-    showStatus("Invalid API key format. Should start with 'sk-'", "error");
+  // Basic validation for Google API keys (they typically start with "AIza" and are 39 characters)
+  if (!key.startsWith("AIza") || key.length < 35) {
+    showStatus("Invalid API key format. Should start with 'AIza'", "error");
     return;
   }
   
   // Save to secure storage
-  chrome.storage.local.set({ openai_api_key: key }, () => {
+  chrome.storage.local.set({ google_api_key: key }, () => {
     actualKey = key;
     keyInput.value = "••••••••••••••••••••";
     isKeyVisible = false;

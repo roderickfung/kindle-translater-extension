@@ -185,7 +185,7 @@ function showTranslation(originalText, translatedText) {
     textAlign: "center",
     background: "rgba(0, 0, 0, 0.2)"
   });
-  footer.textContent = "Translated with GPT-4o mini • Press Esc to close";
+  footer.textContent = "Translated with Google Gemini • Press Esc to close";
 
   box.appendChild(header);
   box.appendChild(content);
@@ -305,60 +305,64 @@ function extractKindleText() {
 // ============================================================================
 
 /**
- * Translate text using OpenAI GPT-4o mini
+ * Translate text using Google Gemini API
  */
-async function translateWithGPT(text) {
+async function translateWithGemini(text) {
   return new Promise((resolve) => {
-    chrome.storage.local.get("openai_api_key", async (data) => {
-      const key = data.openai_api_key;
+    chrome.storage.local.get("google_api_key", async (data) => {
+      const key = data.google_api_key;
       
       if (!key || key === "********" || key.length < 20) {
-        resolve("⚠️ 未找到 API 密钥\n\nNo API key found. Please set your OpenAI API key in the extension popup.\n\n请在扩展弹出窗口中设置您的 OpenAI API 密钥。");
+        resolve("⚠️ 未找到 API 密钥\n\nNo API key found. Please set your Google API key in the extension popup.\n\n请在扩展弹出窗口中设置您的 Google API 密钥。");
         return;
       }
 
       try {
         showOverlay("🌐 正在翻译... Translating...");
         
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        // Try different model names based on availability
+        // Common models: gemini-pro, gemini-1.5-flash-latest, gemini-1.5-pro-latest
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${key}`;
+        
+        const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${key}`
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [
-              {
-                role: "system",
-                content: "You are a professional Japanese to Chinese translator. Translate the given Japanese text into fluent, natural Simplified Chinese (简体中文). Maintain the original tone, style, and nuance. Preserve paragraph breaks. Do not add any explanations or notes - only provide the translation."
-              },
-              { 
-                role: "user", 
-                content: `Please translate this Japanese text to Simplified Chinese:\n\n${text}` 
-              }
-            ],
-            temperature: 0.3,
-            max_tokens: 4000
+            contents: [{
+              parts: [{
+                text: `You are a professional Japanese to Chinese translator. Translate the given Japanese text into fluent, natural Simplified Chinese (简体中文). Maintain the original tone, style, and nuance. Preserve paragraph breaks. Do not add any explanations or notes - only provide the translation.\n\nPlease translate this Japanese text to Simplified Chinese:\n\n${text}`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 4000,
+              topP: 0.95,
+              topK: 40
+            }
           })
         });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          console.error("OpenAI API error:", errorData);
+          console.error("Google Gemini API error:", errorData);
           
-          if (response.status === 401) {
-            resolve("⚠️ API 密钥无效\n\nInvalid API key. Please check your OpenAI API key in the extension settings.\n\n请检查扩展设置中的 OpenAI API 密钥。");
+          if (response.status === 400) {
+            resolve("⚠️ API 密钥无效\n\nInvalid API key. Please check your Google API key in the extension settings.\n\n请检查扩展设置中的 Google API 密钥。");
           } else if (response.status === 429) {
-            resolve("⚠️ 已超出配额\n\nAPI quota exceeded. Please check your OpenAI account.\n\n已超出 API 配额，请检查您的 OpenAI 账户。");
+            resolve("⚠️ 已超出配额\n\nAPI quota exceeded. Please check your Google Cloud account.\n\n已超出 API 配额，请检查您的 Google Cloud 账户。");
+          } else if (response.status === 403) {
+            resolve("⚠️ API 访问被拒绝\n\nAPI access denied. Make sure Gemini API is enabled in your Google Cloud project.\n\n请确保在 Google Cloud 项目中启用了 Gemini API。");
           } else {
-            resolve(`⚠️ 翻译失败\n\nTranslation failed (Error ${response.status}). Please try again.\n\n翻译失败，请重试。`);
+            const errorMsg = errorData.error?.message || "Unknown error";
+            resolve(`⚠️ 翻译失败\n\nTranslation failed (Error ${response.status}): ${errorMsg}\n\n翻译失败，请重试。`);
           }
           return;
         }
 
         const result = await response.json();
-        const translation = result.choices?.[0]?.message?.content?.trim() || "";
+        const translation = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
         
         if (!translation) {
           resolve("⚠️ 未返回翻译\n\nNo translation was returned from the API.\n\nAPI 未返回翻译结果。");
@@ -404,7 +408,7 @@ async function performTranslation() {
     
     console.log(`Extracted ${text.length} characters for translation`);
 
-    const translated = await translateWithGPT(text);
+    const translated = await translateWithGemini(text);
     hideOverlay();
     
     showTranslation(text, translated);
@@ -433,3 +437,332 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 console.log("[Kindle Translator] Ready! Press Cmd/Ctrl+Shift+T to translate.");
+
+// ============================================================================
+// AUTO-DETECT AND TRANSLATE FEATURE
+// ============================================================================
+
+// Configuration for auto-translation
+const AUTO_TRANSLATE_CONFIG = {
+  enabled: true, // Set to false to disable auto-translation
+  minTextLength: 10, // Minimum characters to trigger translation
+  maxTextLength: 500, // Maximum characters per snippet
+  debounceDelay: 1000, // Wait time after page change before translating
+  popupClass: "kt-auto-translate-popup"
+};
+
+// State for auto-translation
+let autoTranslateTimeout = null;
+let currentAutoPopups = new Set();
+let processedTextNodes = new WeakSet();
+
+/**
+ * Remove all auto-translate popups
+ */
+function removeAutoPopups() {
+  currentAutoPopups.forEach(popup => {
+    if (popup && popup.parentNode) {
+      popup.remove();
+    }
+  });
+  currentAutoPopups.clear();
+}
+
+/**
+ * Create a small popup near text element
+ */
+function createAutoPopup(text, translatedText, element) {
+  const popup = document.createElement("div");
+  popup.className = AUTO_TRANSLATE_CONFIG.popupClass;
+  
+  Object.assign(popup.style, {
+    position: "absolute",
+    background: "rgba(42, 82, 152, 0.95)",
+    color: "#fff",
+    padding: "8px 12px",
+    borderRadius: "8px",
+    fontSize: "13px",
+    lineHeight: "1.5",
+    maxWidth: "300px",
+    zIndex: "2147483645",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+    backdropFilter: "blur(8px)",
+    wordWrap: "break-word",
+    cursor: "pointer",
+    transition: "opacity 0.2s",
+    fontFamily: "system-ui, -apple-system, sans-serif"
+  });
+  
+  // Content
+  const contentDiv = document.createElement("div");
+  contentDiv.style.marginBottom = "4px";
+  contentDiv.textContent = translatedText;
+  
+  // Original text (smaller)
+  const originalDiv = document.createElement("div");
+  originalDiv.style.fontSize = "11px";
+  originalDiv.style.opacity = "0.8";
+  originalDiv.style.marginTop = "4px";
+  originalDiv.style.borderTop = "1px solid rgba(255,255,255,0.3)";
+  originalDiv.style.paddingTop = "4px";
+  originalDiv.textContent = `原文: ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`;
+  
+  popup.appendChild(contentDiv);
+  popup.appendChild(originalDiv);
+  
+  // Click to dismiss
+  popup.addEventListener("click", () => {
+    popup.style.opacity = "0";
+    setTimeout(() => {
+      popup.remove();
+      currentAutoPopups.delete(popup);
+    }, 200);
+  });
+  
+  // Auto-dismiss after 10 seconds
+  setTimeout(() => {
+    if (popup.parentNode) {
+      popup.style.opacity = "0";
+      setTimeout(() => {
+        popup.remove();
+        currentAutoPopups.delete(popup);
+      }, 200);
+    }
+  }, 10000);
+  
+  // Position near the element
+  try {
+    const rect = element.getBoundingClientRect();
+    popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
+    popup.style.left = `${rect.left + window.scrollX}px`;
+  } catch (e) {
+    // Fallback position
+    popup.style.top = "100px";
+    popup.style.left = "20px";
+  }
+  
+  document.body.appendChild(popup);
+  currentAutoPopups.add(popup);
+  
+  // Fade in
+  setTimeout(() => popup.style.opacity = "1", 10);
+}
+
+/**
+ * Translate text snippet using Gemini API
+ */
+async function translateSnippet(text) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get("google_api_key", async (data) => {
+      const key = data.google_api_key;
+      
+      if (!key || key.length < 20) {
+        resolve(null); // Silently fail if no API key
+        return;
+      }
+
+      try {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${key}`;
+        
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `Translate this Japanese text to Simplified Chinese. Only provide the translation, no explanations:\n\n${text}`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.2,
+              maxOutputTokens: 1000,
+              topP: 0.8,
+              topK: 40
+            }
+          })
+        });
+
+        if (!response.ok) {
+          console.warn("[Auto Translate] API error:", response.status);
+          resolve(null);
+          return;
+        }
+
+        const result = await response.json();
+        const translation = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;
+        resolve(translation);
+      } catch (err) {
+        console.warn("[Auto Translate] Translation error:", err);
+        resolve(null);
+      }
+    });
+  });
+}
+
+/**
+ * Find and extract text nodes from the page
+ */
+function findTextNodes(root = document.body) {
+  const textNodes = [];
+  const maxNodes = 5; // Limit to avoid overwhelming the page
+  
+  // Look for common Kindle reader elements
+  const readerSelectors = [
+    '[id*="reader"]',
+    '[class*="reader"]',
+    '[id*="column"]',
+    '[class*="column"]',
+    '[id*="page"]',
+    '[class*="page"]',
+    'main',
+    'article'
+  ];
+  
+  let searchRoot = root;
+  for (const selector of readerSelectors) {
+    const element = root.querySelector(selector);
+    if (element) {
+      searchRoot = element;
+      break;
+    }
+  }
+  
+  const walker = document.createTreeWalker(
+    searchRoot,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode: (node) => {
+        // Skip if already processed
+        if (processedTextNodes.has(node)) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        
+        const parent = node.parentElement;
+        if (!parent) return NodeFilter.FILTER_REJECT;
+        
+        // Skip hidden elements
+        const style = window.getComputedStyle(parent);
+        if (style.display === "none" || style.visibility === "hidden") {
+          return NodeFilter.FILTER_REJECT;
+        }
+        
+        // Skip scripts, styles, etc.
+        const tagName = parent.tagName;
+        if (["SCRIPT", "STYLE", "NOSCRIPT", "META", "LINK"].includes(tagName)) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        
+        // Check text content
+        const text = node.textContent.trim();
+        if (text.length < AUTO_TRANSLATE_CONFIG.minTextLength) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        
+        // Check if it contains Japanese characters
+        const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(text);
+        if (!hasJapanese) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    }
+  );
+  
+  let node;
+  while ((node = walker.nextNode()) && textNodes.length < maxNodes) {
+    textNodes.push(node);
+  }
+  
+  return textNodes;
+}
+
+/**
+ * Process and translate text nodes automatically
+ */
+async function autoTranslateVisibleText() {
+  if (!AUTO_TRANSLATE_CONFIG.enabled) return;
+  if (isTranslating) return; // Don't interfere with manual translation
+  
+  console.log("[Auto Translate] Detecting text to translate...");
+  
+  // Remove old popups
+  removeAutoPopups();
+  
+  // Find text nodes
+  const textNodes = findTextNodes();
+  
+  if (textNodes.length === 0) {
+    console.log("[Auto Translate] No suitable text found");
+    return;
+  }
+  
+  console.log(`[Auto Translate] Found ${textNodes.length} text snippets`);
+  
+  // Translate each node
+  for (const node of textNodes) {
+    const text = node.textContent.trim();
+    
+    // Limit text length
+    const textToTranslate = text.substring(0, AUTO_TRANSLATE_CONFIG.maxTextLength);
+    
+    // Translate
+    const translation = await translateSnippet(textToTranslate);
+    
+    if (translation) {
+      // Mark as processed
+      processedTextNodes.add(node);
+      
+      // Show popup near the text
+      const element = node.parentElement;
+      if (element) {
+        createAutoPopup(text, translation, element);
+      }
+    }
+    
+    // Small delay between translations to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  
+  console.log("[Auto Translate] Translation complete");
+}
+
+/**
+ * Detect page changes and trigger auto-translation
+ */
+function setupAutoTranslation() {
+  console.log("[Auto Translate] Setting up page change detection...");
+  
+  const observer = new MutationObserver(() => {
+    // Clear existing timeout
+    clearTimeout(autoTranslateTimeout);
+    
+    // Debounce: wait for page to stabilize
+    autoTranslateTimeout = setTimeout(() => {
+      console.log("[Auto Translate] Page content changed, triggering translation...");
+      autoTranslateVisibleText();
+    }, AUTO_TRANSLATE_CONFIG.debounceDelay);
+  });
+  
+  // Observe the entire document for changes
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+  
+  // Initial translation after page loads
+  setTimeout(() => {
+    console.log("[Auto Translate] Initial page load, translating...");
+    autoTranslateVisibleText();
+  }, 2000); // Wait 2 seconds for page to fully load
+}
+
+// Initialize auto-translation if enabled
+if (AUTO_TRANSLATE_CONFIG.enabled) {
+  setupAutoTranslation();
+  console.log("[Auto Translate] Feature enabled");
+} else {
+  console.log("[Auto Translate] Feature disabled");
+}

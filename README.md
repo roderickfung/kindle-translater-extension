@@ -1,20 +1,20 @@
-# 📘 Kindle Auto Translator
+# 📘 Kindle Auto Translator (Google Gemini)
 
-A Chrome extension that automatically translates Japanese text from Kindle Cloud Reader to Simplified Chinese using OpenAI's GPT-4o mini API.
+A Chrome extension that automatically translates Japanese text from Kindle Cloud Reader to Simplified Chinese using Google's Gemini 1.5 Flash API.
 
 ## ✨ Features
 
 - 🌐 **Automatic Translation**: Translates Japanese Kindle pages to Simplified Chinese
 - ⌨️ **Keyboard Shortcut**: Quick access via `Cmd+Shift+T` (Mac) or `Ctrl+Shift+T` (Windows/Linux)
 - 🎨 **Beautiful Overlay UI**: Easy-to-read translation display with smooth animations
-- 🔒 **Secure Storage**: Your OpenAI API key is stored locally and securely
+- 🔒 **Secure Storage**: Your Google API key is stored locally and securely
 - 🎯 **Smart Text Extraction**: Focuses on reading content, avoiding navigation elements
-- 🚀 **Fast & Efficient**: Uses GPT-4o mini for quick, cost-effective translations
+- 🚀 **Fast & Free**: Uses Gemini 1.5 Flash - generous free tier!
 
 ## 📋 Requirements
 
 - **Google Chrome** (or Chromium-based browser like Edge, Brave, etc.)
-- **OpenAI API Key** - Get one from [platform.openai.com](https://platform.openai.com/api-keys)
+- **Google API Key** - Get one from [Google AI Studio](https://aistudio.google.com/app/apikey)
 - Active internet connection
 
 ## 🚀 Installation
@@ -40,22 +40,13 @@ A Chrome extension that automatically translates Japanese text from Kindle Cloud
    - Click the puzzle piece icon in Chrome toolbar
    - Find "Kindle Auto Translator" and click the pin icon
 
-### Option 2: Package as CRX (Optional)
-
-For a more permanent installation, you can package the extension:
-
-1. Go to `chrome://extensions/`
-2. Click "Pack extension"
-3. Select the extension directory
-4. Install the generated `.crx` file
-
 ## 🔧 Setup
 
-1. **Get an OpenAI API Key**
-   - Visit [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-   - Sign in or create an account
-   - Click "Create new secret key"
-   - Copy the key (starts with `sk-...`)
+1. **Get a Google API Key**
+   - Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - Sign in with your Google account
+   - Click "Create API Key"
+   - Copy the key (starts with `AIza...`)
 
 2. **Configure the extension**
    - Click the extension icon in Chrome toolbar
@@ -105,7 +96,7 @@ The extension intelligently extracts text from the Kindle reading area while avo
 
 ### Security
 - API keys stored in Chrome's local storage (encrypted by browser)
-- Keys never transmitted except to OpenAI's API
+- Keys never transmitted except to Google's API
 - Masked display in settings to prevent shoulder surfing
 - Toggle visibility option for verification
 
@@ -126,20 +117,30 @@ kindle-auto-translate/
 - `activeTab`: Access current tab to inject translation UI
 - `scripting`: Execute scripts on Kindle pages
 - `storage`: Store API key securely
-- Host permissions for Kindle domains and OpenAI API
+- Host permissions for Kindle domains and Google Gemini API
 
 ### API Usage
-- **Model**: GPT-4o mini (cost-effective, fast)
+- **Model**: Gemini 1.5 Flash (fast, free tier available)
+- **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
 - **Temperature**: 0.3 (balanced between accuracy and creativity)
 - **Max tokens**: 4000 (handles long pages)
 
 ## 💰 Cost Estimation
 
-GPT-4o mini is very affordable:
-- Input: ~$0.15 per 1M tokens
-- Output: ~$0.60 per 1M tokens
-- Average Kindle page: ~500-1000 tokens
-- **Cost per page**: Less than $0.001 (fraction of a cent)
+**Google Gemini 1.5 Flash - FREE Tier:**
+- **15 requests per minute** (RPM) - Free
+- **1 million tokens per day** - Free
+- **1,500 requests per day** - Free
+
+**For typical usage:**
+- Average Kindle page: 500-1000 tokens
+- You can translate **hundreds of pages per day for FREE!**
+- Well within the free tier limits for personal use
+
+**Paid tier** (if you exceed free limits):
+- Input: $0.075 per 1M tokens
+- Output: $0.30 per 1M tokens
+- Still very affordable: ~$0.0005 per page
 
 ## 🐛 Troubleshooting
 
@@ -152,8 +153,8 @@ GPT-4o mini is very affordable:
 2. **Verify API key**
    - Click extension icon
    - Click "Show Key" to verify it's correct
-   - Make sure it starts with `sk-`
-   - Check your OpenAI account has available credits
+   - Make sure it starts with `AIza`
+   - Get a new key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 3. **Check browser console**
    - Right-click → Inspect → Console tab
@@ -171,20 +172,30 @@ GPT-4o mini is very affordable:
 - Try clicking next/previous page and back
 - Some pages may have images instead of text (manga, etc.)
 
-### API quota exceeded?
+### API errors?
 
-- Check your OpenAI account balance
-- Verify you're within your usage limits
-- Consider adding payment method if using free tier
+- **403 Forbidden**: Make sure you've enabled the Gemini API in Google AI Studio
+- **429 Rate Limit**: You've exceeded the free tier limits (wait or upgrade)
+- **400 Bad Request**: Check your API key is valid
 
 ## 🔄 Customization
 
 ### Change Target Language
-Edit `content.js`, line 334:
+Edit `content.js`, line 333:
 ```javascript
-content: "You are a professional Japanese to Chinese translator..."
+text: `You are a professional Japanese to Chinese translator...`
 ```
 Change to your desired language pair.
+
+### Change Gemini Model
+Edit `content.js`, line 323:
+```javascript
+const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+```
+You can use:
+- `gemini-1.5-flash` (fastest, free tier)
+- `gemini-1.5-pro` (most capable, paid)
+- `gemini-2.0-flash-exp` (experimental)
 
 ### Change Keyboard Shortcut
 Edit `manifest.json`, lines 27-32:
@@ -195,47 +206,30 @@ Edit `manifest.json`, lines 27-32:
 }
 ```
 
-### Adjust Translation Display Time
-Edit `content.js` to modify overlay and translation box behavior.
+## 🎯 Advantages of Gemini API
 
-## 🤝 Contributing
-
-This is a local extension for personal use, but feel free to:
-- Fork the repository
-- Suggest improvements
-- Report bugs
-- Share with friends!
-
-## 📜 License
-
-This project is for personal use. OpenAI API usage is subject to OpenAI's terms of service.
+✅ **Generous Free Tier** - 1,500 requests per day  
+✅ **Fast Response** - Gemini 1.5 Flash is optimized for speed  
+✅ **High Quality** - Excellent translation quality  
+✅ **Easy Setup** - Simple API key from Google AI Studio  
+✅ **No Credit Card** - Free tier doesn't require payment info  
 
 ## ⚠️ Disclaimer
 
-- This extension is not affiliated with Amazon or Kindle
-- You are responsible for your OpenAI API usage and costs
+- This extension is not affiliated with Amazon, Kindle, or Google
+- You are responsible for your API usage
 - Respect copyright and only translate books you own
-- Translation quality depends on the GPT-4o mini model
-
-## 🎯 Future Enhancements
-
-Potential features to add:
-- [ ] Support for more language pairs
-- [ ] Save translations to local storage
-- [ ] Export translations to file
-- [ ] Adjustable font size and styling
-- [ ] Translation history
-- [ ] Batch translate multiple pages
-- [ ] Support for other e-reader platforms
+- Translation quality depends on the Gemini model
 
 ## 📞 Support
 
 For issues:
 1. Check the troubleshooting section above
 2. Check Chrome console for error messages
-3. Verify OpenAI API key and account status
+3. Verify Google API key at [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ---
 
 **Enjoy your Japanese reading with instant Chinese translations!** 📚✨
 
+**Powered by Google Gemini 1.5 Flash**
